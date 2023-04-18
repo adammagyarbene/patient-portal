@@ -1,16 +1,16 @@
 import React from "react";
-import { NextPage } from "next";
+import { GetServerSideProps, NextPage } from "next";
 import { useState } from "react";
 import Head from "next/head";
 import { useFormik } from "formik";
 import * as Yup from "yup";
 
-import Layout from "@src/components/Layout";
-import PatientList from "@src/components/PatientList";
-import { IPatient } from "@src/services/mongoose/models/patient";
+import Layout from "../components/Layout";
+import PatientList from "../components/PatientList";
+import { IPatient } from "../services/mongoose/models/patient";
+import { searchPatients } from "../services/api";
 import fetchPatients from "@src/services/patients/fetchPatients";
 import Spinner from "@src/components/Spinner";
-import { usePatientContext } from "@src/hooks/usePatientContext";
 
 interface IFilterPatientsProps {
   patients: IPatient[];
@@ -18,7 +18,7 @@ interface IFilterPatientsProps {
 
 const FilterPatients: NextPage<IFilterPatientsProps> = () => {
   const [isLoading, setLoading] = useState(false);
-  const { patients, setPatients } = usePatientContext();
+  const [patients, setPatients] = useState<IPatient[] | [] | null>(null);
 
   const formik = useFormik({
     initialValues: {
@@ -40,7 +40,6 @@ const FilterPatients: NextPage<IFilterPatientsProps> = () => {
     }),
     onSubmit: async (values) => {
       setLoading(true);
-
       const data = await fetchPatients(values);
       const patients: IPatient[] = Object.values(data);
 
@@ -143,6 +142,26 @@ const FilterPatients: NextPage<IFilterPatientsProps> = () => {
       </div>
     </Layout>
   );
+};
+
+export const getServerSideProps: GetServerSideProps = async ({ query }) => {
+  const searchTerm: string = query.searchTerm as string;
+
+  if (!searchTerm) {
+    return {
+      props: {
+        patients: [],
+      },
+    };
+  }
+
+  const patients = await searchPatients(searchTerm);
+
+  return {
+    props: {
+      patients,
+    },
+  };
 };
 
 export default FilterPatients;

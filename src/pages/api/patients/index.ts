@@ -4,7 +4,6 @@ import { PatientModel } from "@src/services/mongoose/models/patient";
 
 const uri = `mongodb+srv://${process.env.MONGO_DB_USER}:${process.env.MONGO_DB_PASSWORD}@cluster0.atiwhmh.mongodb.net/?retryWrites=true&w=majority`;
 
-// api/patients?name=Doe
 export default async function getPatientByName(
   req: NextApiRequest,
   res: NextApiResponse

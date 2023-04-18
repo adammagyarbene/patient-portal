@@ -1,7 +1,7 @@
 import mongoose from "mongoose";
 import patientSchema from "./Patient.schema";
 
-interface IPatient {
+export interface IPatient {
   id: string;
   meta: {
     lastUpdated: string;
